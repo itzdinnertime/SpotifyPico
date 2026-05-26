@@ -1,13 +1,15 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)]
+pub mod api_fetcher;
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct NowPlaying {
     is_playing: bool,
     progress_ms: Option<u64>,
     item: Item,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Item {
     name: String,
     duration_ms: Option<u64>,
@@ -15,18 +17,18 @@ pub struct Item {
     album: Album,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Artist {
     name: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Album {
     name: String,
     images: Vec<Image>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Image {
     url: String,
 }

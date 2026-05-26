@@ -1,6 +1,6 @@
 use crate::NowPlaying;
 
-async fn get_current_playing(
+pub async fn get_current_playing(
     client: &reqwest::Client,
     token: &str,
 ) -> Result<Option<NowPlaying>, reqwest::Error> {
