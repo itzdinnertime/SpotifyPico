@@ -1,4 +1,4 @@
-use spotify_pico::api_fetcher::get_current_playing;
+use spotify_pico::api_fetcher::spotify_fetch::get_current_playing;
 
 #[tokio::main]
 async fn main() {
