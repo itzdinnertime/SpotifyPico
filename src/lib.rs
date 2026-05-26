@@ -1,14 +1,14 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
-struct NowPlaying {
+pub struct NowPlaying {
     is_playing: bool,
     progress_ms: Option<u64>,
     item: Item,
 }
 
 #[derive(Serialize, Deserialize)]
-struct Item {
+pub struct Item {
     name: String,
     duration_ms: Option<u64>,
     artists: Artist,
@@ -16,17 +16,17 @@ struct Item {
 }
 
 #[derive(Serialize, Deserialize)]
-struct Artist {
+pub struct Artist {
     name: String,
 }
 
 #[derive(Serialize, Deserialize)]
-struct Album {
+pub struct Album {
     name: String,
     images: Vec<Image>,
 }
 
 #[derive(Serialize, Deserialize)]
-struct Image {
+pub struct Image {
     url: String,
 }
