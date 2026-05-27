@@ -11,7 +11,7 @@ pub async fn get_current_playing(
         Ok(None)
     } else if response.status().as_u16() == 200 {
         let track = response.json::<NowPlaying>().await?;
-        return Ok(Some(track));
+        Ok(Some(track))
     } else {
         eprintln!("Request failed: {}", response.status());
         Ok(None)
