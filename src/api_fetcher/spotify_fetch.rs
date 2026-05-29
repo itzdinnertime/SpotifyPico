@@ -1,5 +1,6 @@
 use crate::NowPlaying;
 
+/// Fetches the current playing track from the Spotify API.
 pub async fn get_current_playing(
     client: &reqwest::Client,
     token: &str,
