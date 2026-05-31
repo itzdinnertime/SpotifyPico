@@ -24,3 +24,10 @@ pub fn build_auth_url(client_id: &str, code_challenge: &str) -> String {
     );
     return url;
 }
+
+/// Opens the url
+pub fn open_auth_url(url: &str) {
+    if let Err(e) = open::that(url) {
+        eprintln!("Failed to open browser: {}", e);
+    }
+}
