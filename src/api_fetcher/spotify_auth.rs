@@ -1,6 +1,10 @@
 use base64::{Engine, engine::general_purpose::URL_SAFE_NO_PAD};
 use rand::random;
+use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
+use std::sync::{Arc, Mutex};
+
+use axum::extract::{Query, State};
 
 /// Generates a random code verifier.
 pub fn generate_code_verifier() -> String {
@@ -30,4 +34,32 @@ pub fn open_auth_url(url: &str) {
     if let Err(e) = open::that(url) {
         eprintln!("Failed to open browser: {}", e);
     }
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct CallbackParams {
+    code: String,
+}
+
+pub async fn handler_function(
+    State(tx): State<Arc<Mutex<Option<tokio::sync::oneshot::Sender<String>>>>>,
+    Query(params): Query<CallbackParams>,
+) -> &'static str {
+    if let Some(sender) = tx.lock().unwrap().take() {
+        sender.send(params.code).unwrap();
+    }
+
+    "Login successful, you can close this tab"
+}
+pub async fn start_callback_server() -> Result<String, Box<dyn std::error::Error>> {
+    let (tx, rx) = tokio::sync::oneshot::channel::<String>();
+    let tx = Arc::new(Mutex::new(Some(tx)));
+    let app = axum::Router::new()
+        .route("/callback", axum::routing::get(handler_function))
+        .with_state(tx);
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:8888").await?;
+    axum::serve(listener, app).await?;
+
+    let code = rx.await?;
+    return Ok(code);
 }
