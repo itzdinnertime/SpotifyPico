@@ -1,9 +1,12 @@
-use spotify_pico::api_fetcher::spotify_fetch::get_current_playing;
+use spotify_pico::api_fetcher::{spotify_auth::authenticate, spotify_fetch::get_current_playing};
 
 #[tokio::main]
 async fn main() {
+    dotenvy::dotenv().ok();
+    let client_id = std::env::var("SPOTIFY_CLIENT_ID").unwrap();
     let client = reqwest::Client::new();
-    match get_current_playing(&client, "").await {
+    let token_response = authenticate(&client, &client_id).await.unwrap();
+    match get_current_playing(&client, &token_response.access_token).await {
         Ok(Some(track)) => println!("Playing: {:?}", track),
         Ok(None) => println!("Nothing playing"),
         Err(e) => println!("Error: {}", e),

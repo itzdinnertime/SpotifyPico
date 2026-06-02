@@ -23,8 +23,8 @@ pub fn generate_code_challenge(verifier: &str) -> String {
 /// Builds the Spotify authorization URL.
 pub fn build_auth_url(client_id: &str, code_challenge: &str) -> String {
     let url = format!(
-        "https://accounts.spotify.com/authorize?client_id={}&code_challenge={}&response_type=code&redirect_uri={}&code_challenge_method=S256&scope=user-read-currently-playing",
-        client_id, code_challenge, "http://localhost:8888/callback"
+        "https://accounts.spotify.com/authorize?client_id={}&response_type=code&code_challenge_method=S256&code_challenge={}&redirect_uri=http://127.0.0.1:8888/callback&scope=user-read-currently-playing",
+        client_id, code_challenge
     );
     return url;
 }
@@ -66,8 +66,8 @@ pub async fn start_callback_server() -> Result<String, Box<dyn std::error::Error
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct TokenResponse {
-    access_token: String,
-    refresh_token: String,
+    pub access_token: String,
+    pub refresh_token: String,
 }
 
 pub async fn exchange_code_for_token(
@@ -81,7 +81,7 @@ pub async fn exchange_code_for_token(
         .form(&[
             ("grant_type", "authorization_code"),
             ("code", code),
-            ("redirect_uri", "http://localhost:8888/callback"),
+            ("redirect_uri", "http://127.0.0.1:8888/callback"),
             ("client_id", client_id),
             ("code_verifier", code_verifier),
         ])
