@@ -63,3 +63,31 @@ pub async fn start_callback_server() -> Result<String, Box<dyn std::error::Error
     let code = rx.await?;
     return Ok(code);
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct TokenResponse {
+    access_token: String,
+    refresh_token: String,
+}
+
+pub async fn exchange_code_for_token(
+    client: &reqwest::Client,
+    code: &str,
+    client_id: &str,
+    code_verifier: &str,
+) -> Result<TokenResponse, Box<dyn std::error::Error>> {
+    let response = client
+        .post("https://accounts.spotify.com/api/token")
+        .form(&[
+            ("grant_type", "authorization_code"),
+            ("code", code),
+            ("redirect_uri", "http://localhost:8888/callback"),
+            ("client_id", client_id),
+            ("code_verifier", code_verifier),
+        ])
+        .send()
+        .await?;
+
+    let token_response: TokenResponse = response.json().await?;
+    Ok(token_response)
+}
