@@ -91,3 +91,15 @@ pub async fn exchange_code_for_token(
     let token_response: TokenResponse = response.json().await?;
     Ok(token_response)
 }
+
+pub async fn authenticate(
+    client: &reqwest::Client,
+    client_id: &str,
+) -> Result<TokenResponse, Box<dyn std::error::Error>> {
+    let verifier = generate_code_verifier();
+    let challenge = generate_code_challenge(&verifier);
+    let url = build_auth_url(client_id, &challenge);
+    open_auth_url(&url);
+    let code = start_callback_server().await?;
+    exchange_code_for_token(client, &code, client_id, &verifier).await
+}
