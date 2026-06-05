@@ -103,3 +103,22 @@ pub async fn authenticate(
     let code = start_callback_server().await?;
     exchange_code_for_token(client, &code, client_id, &verifier).await
 }
+
+pub async fn refresh_access_token(
+    client: &reqwest::Client,
+    refresh_token: &str,
+    client_id: &str,
+) -> Result<TokenResponse, Box<dyn std::error::Error>> {
+    let response = client
+        .post("https://accounts.spotify.com/api/token")
+        .form(&[
+            ("grant_type", "refresh_token"),
+            ("refresh_token", refresh_token),
+            ("client_id", client_id),
+        ])
+        .send()
+        .await?;
+
+    let token_response: TokenResponse = response.json().await?;
+    Ok(token_response)
+}
