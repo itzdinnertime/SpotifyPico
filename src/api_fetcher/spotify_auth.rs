@@ -68,6 +68,7 @@ pub async fn start_callback_server() -> Result<String, Box<dyn std::error::Error
 pub struct TokenResponse {
     pub access_token: String,
     pub refresh_token: String,
+    pub expires_in: u64,
 }
 
 pub async fn exchange_code_for_token(
