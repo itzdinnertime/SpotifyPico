@@ -71,6 +71,7 @@ pub struct TokenResponse {
     pub expires_in: u64,
 }
 
+// Exchanges the authorization code for an access token and refresh token from Spotify's API.
 pub async fn exchange_code_for_token(
     client: &reqwest::Client,
     code: &str,
@@ -93,6 +94,7 @@ pub async fn exchange_code_for_token(
     Ok(token_response)
 }
 
+// Authenticates the user by opening a browser window and waiting for the callback server to receive the authorization code.
 pub async fn authenticate(
     client: &reqwest::Client,
     client_id: &str,
@@ -105,6 +107,7 @@ pub async fn authenticate(
     exchange_code_for_token(client, &code, client_id, &verifier).await
 }
 
+// Refreshes the access token using the refresh token from Spotify's API.
 pub async fn refresh_access_token(
     client: &reqwest::Client,
     refresh_token: &str,
