@@ -58,10 +58,12 @@ pub async fn start_callback_server() -> Result<String, Box<dyn std::error::Error
         .route("/callback", axum::routing::get(handler_function))
         .with_state(tx);
     let listener = tokio::net::TcpListener::bind("127.0.0.1:8888").await?;
-    axum::serve(listener, app).await?;
+    tokio::select! {
+        _ = axum::serve(listener, app) => {}
+        result = rx => { return Ok(result?); }
+    }
 
-    let code = rx.await?;
-    return Ok(code);
+    Ok(String::new())
 }
 
 #[derive(Serialize, Deserialize, Debug)]

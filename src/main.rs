@@ -10,7 +10,9 @@ async fn main() {
     dotenvy::dotenv().ok();
     let client_id = std::env::var("SPOTIFY_CLIENT_ID").unwrap();
     let client = reqwest::Client::new();
+    eprintln!("Starting authentication...");
     let mut token_response = authenticate(&client, &client_id).await.unwrap();
+    eprintln!("Authenticated successfully!");
     let mut token_issued = std::time::Instant::now();
     let state = Arc::new(Mutex::new(None::<NowPlaying>));
     let server_state = state.clone();
