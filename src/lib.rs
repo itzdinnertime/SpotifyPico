@@ -13,8 +13,10 @@ pub struct NowPlaying {
 pub struct Item {
     name: String,
     duration_ms: Option<u64>,
-    artists: Artist,
+    artists: Vec<Artist>,
     album: Album,
+    preview_url: Option<String>,
+    available_markets: Option<Vec<String>>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -26,9 +28,12 @@ pub struct Artist {
 pub struct Album {
     name: String,
     images: Vec<Image>,
+    available_markets: Option<Vec<String>>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Image {
-    url: String,
+    pub url: String,
+    pub height: Option<u64>,
+    pub width: Option<u64>,
 }
