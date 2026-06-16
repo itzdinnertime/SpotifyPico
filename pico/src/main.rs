@@ -5,4 +5,6 @@ use defmt_rtt as _;
 use panic_probe as _;
 
 #[embassy_executor::main]
-async fn main(_spawner: embassy_executor::Spawner) {}
+async fn main(_spawner: embassy_executor::Spawner) {
+    let p = embassy_rp::init(Default::default());
+}
