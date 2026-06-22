@@ -6,6 +6,8 @@ use defmt_rtt as _;
 use embassy_rp::gpio::{Level, Output};
 use embassy_rp::pio::Pio;
 use panic_probe as _;
+use reqwless::client::HttpClient;
+use reqwless::request::Method;
 use static_cell::StaticCell;
 
 embassy_rp::bind_interrupts!(struct Irqs {
@@ -72,4 +74,23 @@ async fn main(spawner: embassy_executor::Spawner) {
         .unwrap();
 
     spawner.spawn(net_task(stack)).unwrap();
+    stack.wait_config_up().await;
+
+    let mut rx_buffer = [0u8; 4096];
+    let mut tx_buffer = [0u8; 4096];
+    let mut client = HttpClient::new(&mut tcp_client, &dns_client);
+
+    loop {
+        let response = client
+            .request(Method::GET, "http://192.168.0.199:3000/now-playing")
+            .await;
+        match response {
+            Ok(resp) => {
+                defmt::info!("Got response");
+            }
+            Err(e) => {
+                defmt::info!("Error: {:?}", e);
+            }
+        }
+    }
 }
