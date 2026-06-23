@@ -3,6 +3,7 @@
 
 use cyw43_pio::PioSpi;
 use defmt_rtt as _;
+use embassy_net::tcp::client::{TcpClient, TcpClientState};
 use embassy_rp::gpio::{Level, Output};
 use embassy_rp::pio::Pio;
 use panic_probe as _;
@@ -76,16 +77,19 @@ async fn main(spawner: embassy_executor::Spawner) {
     spawner.spawn(net_task(stack)).unwrap();
     stack.wait_config_up().await;
 
-    let mut rx_buffer = [0u8; 4096];
-    let mut tx_buffer = [0u8; 4096];
-    let mut client = HttpClient::new(&mut tcp_client, &dns_client);
+    let rx_buffer = [0u8; 4096];
+    let tx_buffer = [0u8; 4096];
+    let dns = embassy_net::dns::DnsSocket::new(stack);
+    static TCP_STATE: StaticCell<TcpClientState<1, 1024, 1024>> = StaticCell::new();
+    let tcp_client = TcpClient::new(stack, TCP_STATE.init(TcpClientState::new()));
+    let mut client = HttpClient::new(&tcp_client, &dns);
 
     loop {
         let response = client
             .request(Method::GET, "http://192.168.0.199:3000/now-playing")
             .await;
         match response {
-            Ok(resp) => {
+            Ok(_resp) => {
                 defmt::info!("Got response");
             }
             Err(e) => {
