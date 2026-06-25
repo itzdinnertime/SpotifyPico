@@ -83,6 +83,8 @@ async fn main(spawner: embassy_executor::Spawner) {
     static TCP_STATE: StaticCell<TcpClientState<1, 1024, 1024>> = StaticCell::new();
     let tcp_client = TcpClient::new(stack, TCP_STATE.init(TcpClientState::new()));
     let mut client = HttpClient::new(&tcp_client, &dns);
+    let mut response = client.request(Method::GET, url).await?;
+    let body = response.body().read_to_end(&mut rx_buffer).await?;
 
     loop {
         let response = client
