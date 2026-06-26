@@ -77,26 +77,26 @@ async fn main(spawner: embassy_executor::Spawner) {
     spawner.spawn(net_task(stack)).unwrap();
     stack.wait_config_up().await;
 
-    let rx_buffer = [0u8; 4096];
+    let mut rx_buffer = [0u8; 4096];
     let tx_buffer = [0u8; 4096];
     let dns = embassy_net::dns::DnsSocket::new(stack);
     static TCP_STATE: StaticCell<TcpClientState<1, 1024, 1024>> = StaticCell::new();
     let tcp_client = TcpClient::new(stack, TCP_STATE.init(TcpClientState::new()));
     let mut client = HttpClient::new(&tcp_client, &dns);
-    let mut response = client.request(Method::GET, url).await?;
-    let body = response.body().read_to_end(&mut rx_buffer).await?;
 
     loop {
-        let response = client
+        match client
             .request(Method::GET, "http://192.168.0.199:3000/now-playing")
-            .await;
-        match response {
-            Ok(_resp) => {
+            .await
+        {
+            Ok(mut response) => {
+                let body = response.send(&mut rx_buffer).await.unwrap();
                 defmt::info!("Got response");
             }
             Err(e) => {
                 defmt::info!("Error: {:?}", e);
             }
         }
+        embassy_time::Timer::after(embassy_time::Duration::from_secs(5)).await;
     }
 }
