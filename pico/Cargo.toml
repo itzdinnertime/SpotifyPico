@@ -5,7 +5,8 @@ edition = "2021"
 
 [dependencies]
 embassy-executor = { version = "0.6.0", features = ["task-arena-size-32768", "arch-cortex-m", "executor-thread", "defmt"] }
-embassy-rp = { version = "0.2.0", features = ["defmt", "unstable-pac", "time-driver", "critical-section-impl"] }embassy-net = { version = "0.4.0", features = ["tcp", "udp", "dhcpv4", "dns", "defmt"] }
+embassy-rp = { version = "0.2.0", features = ["defmt", "unstable-pac", "time-driver", "critical-section-impl"] }
+embassy-net = { version = "0.4.0", features = ["tcp", "udp", "dhcpv4", "dns", "defmt"] }
 embassy-time = { version = "0.3.2", features = ["defmt", "defmt-timestamp-uptime"] }
 cyw43 = { version = "0.2.0", features = ["defmt", "firmware-logs"] }
 cyw43-pio = { version = "0.2.0", features = ["defmt"] }
@@ -14,12 +15,11 @@ defmt-rtt = "0.4"
 panic-probe = { version = "0.3", features = ["print-defmt"] }
 reqwless = { version = "0.12.0", features = ["defmt"] }
 heapless = "0.8"
-portable-atomic = { version = "1", features = ["critical-section"] }
 serde = { version = "1.0", default-features = false, features = ["derive"] }
 serde-json-core = "0.5"
 cortex-m-rt = "0.7.0"
 static_cell = "2"
-cortex-m = { version = "0.7.7", features = ["inline-asm", "critical-section-single-core"] }
+cortex-m = { version = "0.7.7", features = ["inline-asm"] }
 
 [profile.release]
 debug = 2
