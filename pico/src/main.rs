@@ -16,18 +16,12 @@ embassy_rp::bind_interrupts!(struct Irqs {
 });
 
 #[embassy_executor::task]
-async fn wifi_task(
-    runner: cyw43::Runner<
-        'static,
-        Output<'static>,
-        PioSpi<'static, embassy_rp::peripherals::PIO0, 0, embassy_rp::peripherals::DMA_CH0>,
-    >,
-) -> ! {
+async fn wifi_task(runner: cyw43::Runner<'static, cyw43::SpiBus<Output<'static>, PioSpi<'static, PIO0, 0>>>) -> ! {
     runner.run().await
 }
 
 #[embassy_executor::task]
-async fn net_task(stack: &'static embassy_net::Stack<cyw43::NetDriver<'static>>) -> ! {
+async fn net_task(stack: &'static embassy_net::Stack<'static>) -> ! {
     stack.run().await
 }
 
@@ -46,7 +40,6 @@ async fn main(spawner: embassy_executor::Spawner) {
         cs,
         p.PIN_24,
         p.PIN_29,
-        p.DMA_CH0,
     );
     static STATE: StaticCell<cyw43::State> = StaticCell::new();
     let state = STATE.init(cyw43::State::new());
@@ -70,11 +63,11 @@ async fn main(spawner: embassy_executor::Spawner) {
         1234,
     ));
     control
-        .join_wpa2("YOUR_WIFI_SSID", "YOUR_WIFI_PASSWORD")
+        .join_wpa2_personal("YOUR_WIFI_SSID", "YOUR_WIFI_PASSWORD")
         .await
         .unwrap();
 
-    spawner.spawn(net_task(stack)).unwrap();
+    spawner.spawn(net_task(stack));
     stack.wait_config_up().await;
 
     let mut rx_buffer = [0u8; 4096];
@@ -83,6 +76,7 @@ async fn main(spawner: embassy_executor::Spawner) {
     static TCP_STATE: StaticCell<TcpClientState<1, 1024, 1024>> = StaticCell::new();
     let tcp_client = TcpClient::new(stack, TCP_STATE.init(TcpClientState::new()));
     let mut client = HttpClient::new(&tcp_client, &dns);
+    let (stack, runner) = embassy_net::new(net_device, config, RESOURCES.init(StackResources::new()), seed);
 
     loop {
         match client
