@@ -6,12 +6,12 @@ use spotify_pico::api_fetcher::{
 use std::sync::{Arc, Mutex};
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenvy::dotenv().ok();
-    let client_id = std::env::var("SPOTIFY_CLIENT_ID").unwrap();
+    let client_id = std::env::var("SPOTIFY_CLIENT_ID")?;
     let client = reqwest::Client::new();
     eprintln!("Starting authentication...");
-    let mut token_response = authenticate(&client, &client_id).await.unwrap();
+    let mut token_response = authenticate(&client, &client_id).await?;
     eprintln!("Authenticated successfully!");
     let mut token_issued = std::time::Instant::now();
     let state = Arc::new(Mutex::new(None::<NowPlaying>));
@@ -25,16 +25,14 @@ async fn main() {
         // Check if token is expired and refresh if needed
         if token_issued.elapsed().as_secs() >= token_response.expires_in {
             token_response =
-                refresh_access_token(&client, &token_response.refresh_token, &client_id)
-                    .await
-                    .unwrap();
+                refresh_access_token(&client, &token_response.refresh_token, &client_id).await?;
             token_issued = std::time::Instant::now();
         }
 
         // Fetch current track
         match get_current_playing(&client, &token_response.access_token).await {
             Ok(Some(track)) => {
-                *state.lock().unwrap() = Some(track.clone());
+                *state.lock().expect("mutex poisoned") = Some(track.clone());
                 println!("Playing: {:?}", track);
             }
             Ok(None) => println!("Nothing playing"),
