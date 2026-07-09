@@ -10,9 +10,9 @@ embassy-rp = { path = "C:/Users/darkp/embassy/embassy-rp", features = ["defmt", 
 embassy-net = { path = "C:/Users/darkp/embassy/embassy-net", features = ["defmt", "tcp", "udp", "dhcpv4", "dns"] }
 cyw43 = { path = "C:/Users/darkp/embassy/cyw43", features = ["defmt", "firmware-logs"] }
 cyw43-pio = { path = "C:/Users/darkp/embassy/cyw43-pio", features = ["defmt"] }
-defmt = "1.0.1"
-defmt-rtt = "1.0.0"
-panic-probe = { version = "1.0.0", features = ["print-defmt"] }
+defmt = { path = "C:/Users/darkp/embassy/defmt" }
+defmt-rtt = { path = "C:/Users/darkp/embassy/defmt-rtt" }
+panic-probe = { path = "C:/Users/darkp/embassy/panic-probe", features = ["print-defmt"] }
 reqwless = { git = "https://github.com/drogue-iot/reqwless", rev = "68f703dfc16e6f7f964b7238c922c0d433118872", features = ["defmt"] }
 cortex-m = { version = "0.7.6", features = ["inline-asm"] }
 cortex-m-rt = "0.7.0"
