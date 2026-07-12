@@ -187,27 +187,50 @@ async fn main(spawner: Spawner) {
 
         // Parse the JSON response from httpbin.org/json
         #[derive(Deserialize)]
-        struct SlideShow<'a> {
-            author: &'a str,
-            title: &'a str,
+        struct Artist<'a> {
+            name: &'a str,
         }
 
         #[derive(Deserialize)]
-        struct HttpBinResponse<'a> {
+        struct Image<'a> {
+            url: &'a str,
+        }
+
+        #[derive(Deserialize)]
+        struct Album<'a> {
+            name: &'a str,
             #[serde(borrow)]
-            slideshow: SlideShow<'a>,
+            images: heapless::Vec<Image<'a>, 4>,
+        }
+
+        #[derive(Deserialize)]
+        struct Item<'a> {
+            name: &'a str,
+            #[serde(borrow)]
+            artists: heapless::Vec<Artist<'a>, 4>,
+            #[serde(borrow)]
+            album: Album<'a>,
+        }
+
+        #[derive(Deserialize)]
+        struct NowPlaying<'a> {
+            is_playing: bool,
+            #[serde(borrow)]
+            item: Item<'a>,
         }
 
         let bytes = body.as_bytes();
-        match from_slice::<HttpBinResponse>(bytes) {
+        match from_slice::<NowPlaying>(bytes) {
             Ok((output, _used)) => {
-                info!("Successfully parsed JSON response!");
-                info!("Slideshow title: {:?}", output.slideshow.title);
-                info!("Slideshow author: {:?}", output.slideshow.author);
+                info!("Is playing: {}", output.is_playing);
+                info!("Track: {:?}", output.item.name);
+                if let Some(artist) = output.item.artists.first() {
+                    info!("Artist: {:?}", artist.name);
+                }
+                info!("Album: {:?}", output.item.album.name);
             }
             Err(e) => {
-                error!("Failed to parse JSON response: {}", Debug2Format(&e));
-                // Log preview of response for debugging
+                error!("Failed to parse JSON: {}", Debug2Format(&e));
                 let preview = if body.len() > 200 { &body[..200] } else { body };
                 info!("Response preview: {:?}", preview);
             }
