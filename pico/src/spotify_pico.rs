@@ -1,6 +1,8 @@
 //! This example uses the RP Pico W board Wifi chip (cyw43).
 //! Connects to Wifi network and makes a web request to httpbin.org.
-
+// Jason Chen
+// 15/05/26
+//
 #![no_std]
 #![no_main]
 
@@ -38,7 +40,11 @@ const WIFI_PASSWORD: &str = "pwd"; // change to your network password
 
 #[embassy_executor::task]
 async fn cyw43_task(
-    runner: cyw43::Runner<'static, cyw43::SpiBus<Output<'static>, PioSpi<'static, PIO0, 0>>, cyw43::Cyw43439>,
+    runner: cyw43::Runner<
+        'static,
+        cyw43::SpiBus<Output<'static>, PioSpi<'static, PIO0, 0>>,
+        cyw43::Cyw43439,
+    >,
 ) -> ! {
     runner.run().await
 }
@@ -103,7 +109,12 @@ async fn main(spawner: Spawner) {
 
     // Init network stack
     static RESOURCES: StaticCell<StackResources<5>> = StaticCell::new();
-    let (stack, runner) = embassy_net::new(net_device, config, RESOURCES.init(StackResources::new()), seed);
+    let (stack, runner) = embassy_net::new(
+        net_device,
+        config,
+        RESOURCES.init(StackResources::new()),
+        seed,
+    );
 
     spawner.spawn(unwrap!(net_task(runner)));
 
