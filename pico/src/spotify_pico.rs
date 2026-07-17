@@ -1,8 +1,6 @@
 //! This example uses the RP Pico W board Wifi chip (cyw43).
 //! Connects to Wifi network and makes a web request to httpbin.org.
-// Jason Chen
-// 15/05/26
-//
+
 #![no_std]
 #![no_main]
 
