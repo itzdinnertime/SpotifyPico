@@ -33,8 +33,8 @@ bind_interrupts!(struct Irqs {
     DMA_IRQ_0 => dma::InterruptHandler<DMA_CH0>, dma::InterruptHandler<DMA_CH1>;
 });
 
-const WIFI_NETWORK: &str = "ssid"; // change to your network SSID
-const WIFI_PASSWORD: &str = "pwd"; // change to your network password
+const WIFI_NETWORK: &str = YOUR_WIFI_SSID;
+const WIFI_PASSWORD: &str = YOUR_WIFI_PASSWORD;
 
 #[embassy_executor::task]
 async fn cyw43_task(
