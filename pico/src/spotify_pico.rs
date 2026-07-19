@@ -33,6 +33,7 @@ bind_interrupts!(struct Irqs {
     DMA_IRQ_0 => dma::InterruptHandler<DMA_CH0>, dma::InterruptHandler<DMA_CH1>;
 });
 
+// set internet name and password
 const WIFI_NETWORK: &str = YOUR_WIFI_SSID;
 const WIFI_PASSWORD: &str = YOUR_WIFI_PASSWORD;
 
