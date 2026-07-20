@@ -34,8 +34,8 @@ bind_interrupts!(struct Irqs {
 });
 
 // set internet name and password
-const WIFI_NETWORK: &str = YOUR_WIFI_SSID;
-const WIFI_PASSWORD: &str = YOUR_WIFI_PASSWORD;
+const WIFI_NETWORK: &str = env!("WIFI_SSID");
+const WIFI_PASSWORD: &str = env!("WIFI_PASSWORD");
 
 #[embassy_executor::task]
 async fn cyw43_task(
