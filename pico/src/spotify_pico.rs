@@ -20,8 +20,6 @@ use embassy_rp::pio::{InterruptHandler, Pio};
 use embassy_rp::{bind_interrupts, dma};
 use embassy_time::{Duration, Timer};
 use reqwless::client::HttpClient;
-// Uncomment these for TLS requests:
-// use reqwless::client::{HttpClient, TlsConfig, TlsVerify};
 use reqwless::request::Method;
 use serde::Deserialize;
 use serde_json_core::from_slice;
