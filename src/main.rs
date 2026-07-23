@@ -4,15 +4,17 @@ use spotify_pico::api_fetcher::{
     spotify_fetch::get_current_playing,
 };
 use std::sync::{Arc, Mutex};
+use tracing::{error, info};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    tracing_subscriber::fmt::init();
     dotenvy::dotenv().ok();
     let client_id = std::env::var("SPOTIFY_CLIENT_ID")?;
     let client = reqwest::Client::new();
-    eprintln!("Starting authentication...");
+    info!("Starting authentication...");
     let mut token_response = authenticate(&client, &client_id).await?;
-    eprintln!("Authenticated successfully!");
+    info!("Authenticated successfully!");
     let mut token_issued = std::time::Instant::now();
     let state = Arc::new(Mutex::new(None::<NowPlaying>));
     let server_state = state.clone();
@@ -33,10 +35,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         match get_current_playing(&client, &token_response.access_token).await {
             Ok(Some(track)) => {
                 *state.lock().expect("mutex poisoned") = Some(track.clone());
-                println!("Playing: {:?}", track);
+                info!("Playing: {:?}", track)
             }
-            Ok(None) => println!("Nothing playing"),
-            Err(e) => println!("Error: {}", e),
+            Ok(None) => info!("Nothing playing"),
+            Err(e) => error!("Fetch error: {}", e),
         }
 
         // Wait 5 seconds
