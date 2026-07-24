@@ -25,7 +25,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     loop {
         // Check if token is expired and refresh if needed
-        if token_issued.elapsed().as_secs() >= token_response.expires_in {
+        if token_issued.elapsed().as_secs() >= token_response.expires_in.saturating_sub(60) {
             token_response =
                 refresh_access_token(&client, &token_response.refresh_token, &client_id).await?;
             token_issued = std::time::Instant::now();
